@@ -59,5 +59,25 @@ namespace PokerTown
                 Console.Clear();
             } while (true);
         }
+
+        public static bool? AskBinary(string question)
+        {
+            Console.WriteLine(question);
+            Console.Write("Y/N: ");
+            var response = Console.ReadKey();
+            Console.WriteLine(Environment.NewLine);
+            if (response.Key == ConsoleKey.Y)
+            {
+                return true;
+            }
+            else if (response.Key == ConsoleKey.N)
+            {
+                return false;
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }

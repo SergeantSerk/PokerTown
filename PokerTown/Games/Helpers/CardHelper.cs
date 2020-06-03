@@ -2,11 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace PokerTown
+namespace PokerTown.Games.Helpers
 {
-    internal static class CardHelper
+    public static class CardHelper
     {
-        internal enum Suit
+        public const int CardHeight = 5;
+        public const int PackedCardOffset = 4;
+        public const int SpacedCardOffset = 7;
+
+        public enum Suit
         {
             Clubs,
             Diamonds,
@@ -14,17 +18,16 @@ namespace PokerTown
             Spades
         }
 
-        internal static Card GetRandomCard()
+        public static Card GetRandomCard()
         {
             var random = new Random();
             var s = random.Next(0, 4);
-            var v = random.Next(0, 13);
             var suit = (Suit)s;
-            var value = GetCardValue(v);
+            var value = random.Next(0, 13);
             return new Card(suit, value);
         }
 
-        internal static void PrintCards(ICollection<Card> cards, int cardOffset)
+        public static void PrintCards(ICollection<Card> cards, int cardOffset)
         {
             if (cards == null)
             {
@@ -44,14 +47,14 @@ namespace PokerTown
             }
         }
 
-        internal static void PrintCard(Suit s, string v, int xOffset, int yOffset)
+        public static void PrintCard(Suit s, int v, int xOffset, int yOffset)
         {
             Console.SetCursorPosition(xOffset, yOffset);
             Console.WriteLine($"┌─────┐");
 
             Console.SetCursorPosition(xOffset, yOffset + 1);
             Console.Write("│");
-            PrintColouredCharacter(s, v.PadRight(2));
+            PrintColouredCharacter(s, CardValueToString(v).PadRight(2));
             Console.WriteLine("   │");
 
             Console.SetCursorPosition(xOffset, yOffset + 2);
@@ -61,14 +64,16 @@ namespace PokerTown
 
             Console.SetCursorPosition(xOffset, yOffset + 3);
             Console.Write("│   ");
-            PrintColouredCharacter(s, v.PadLeft(2));
+            PrintColouredCharacter(s, CardValueToString(v).PadLeft(2));
             Console.WriteLine("│");
 
             Console.SetCursorPosition(xOffset, yOffset + 4);
-            Console.WriteLine($"└─────┘");
-
+            Console.Write($"└─────┘");
         }
 
+        /// <summary>
+        /// Prints <paramref name="value"/> (with colour) based on <paramref name="suit"/>.
+        /// </summary>
         private static void PrintColouredCharacter(Suit suit, string value)
         {
             var previous = Console.ForegroundColor;
@@ -77,36 +82,38 @@ namespace PokerTown
             Console.ForegroundColor = previous;
         }
 
-        private static string GetCardValue(int v)
+        /// <summary>
+        /// Convert raw card <paramref name="value"/> to letter representation on real cards.
+        /// </summary>
+        private static string CardValueToString(int value)
         {
-            if (v == 0)
+            if (value == 0)
             {
                 return "A";
             }
-            else if (v >= 1 && v <= 9)
+            else if (value >= 1 && value <= 9)
             {
-                return (v + 1).ToString();
+                return (value + 1).ToString();
             }
-            else if (v >= 10 && v <= 12)
+            else if (value >= 10 && value <= 12)
             {
-                switch (v)
+                return value switch
                 {
-                    case 10:
-                        return "J";
-                    case 11:
-                        return "Q";
-                    case 12:
-                        return "K";
-                    default:
-                        throw new InvalidOperationException($"Unable to find case for {v} to card value");
-                }
+                    10 => "J",
+                    11 => "Q",
+                    12 => "K",
+                    _ => throw new InvalidOperationException($"Unable to find case for {value} to card value"),
+                };
             }
             else
             {
-                throw new ArgumentOutOfRangeException($"No card value matches {v}");
+                throw new ArgumentOutOfRangeException($"No card value matches {value}");
             }
         }
 
+        /// <summary>
+        /// Derive card <paramref name="suit"/> to string representation.
+        /// </summary>
         private static string SuitToSymbol(Suit suit)
         {
             return suit switch
@@ -119,6 +126,9 @@ namespace PokerTown
             };
         }
 
+        /// <summary>
+        /// Derive card colour from <paramref name="suit"/>.
+        /// </summary>
         private static ConsoleColor SuitToColour(Suit suit)
         {
             switch (suit)
