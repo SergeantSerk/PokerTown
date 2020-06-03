@@ -1,29 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using static PokerTown.CardHelper;
 
 namespace PokerTown
 {
-    internal static class Card
+    internal class Card
     {
-        internal enum Suit
-        {
-            Clubs,
-            Diamonds,
-            Hearts,
-            Spades
-        }
+        internal Suit Suit { get; private set; }
 
-        internal static string ToSuitString(this Suit suit)
+        internal string Value { get; private set; }
+
+        internal Card(Suit suit, string value)
         {
-            return suit switch
-            {
-                Suit.Clubs => "♣",
-                Suit.Diamonds => "♦",
-                Suit.Hearts => "♥",
-                Suit.Spades => "♠",
-                _ => string.Empty,
-            };
+            Suit = suit;
+            Value = value;
         }
     }
 }
