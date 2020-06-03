@@ -15,6 +15,9 @@ namespace PokerTown
         {
             Console.OutputEncoding = Encoding.UTF8;
             Console.Title = "PokerTown";
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.BackgroundColor = ConsoleColor.DarkGreen;
+            Console.Clear();
             Console.WriteLine("Welcome to PokerTown, please select a gamemode to begin playing:");
 
             do
