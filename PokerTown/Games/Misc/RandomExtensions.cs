@@ -5,7 +5,7 @@ using System.Text;
 /// <summary>
 /// Solution by Matt Howells (and community) -> https://stackoverflow.com/a/110570/4339019
 /// </summary>
-namespace PokerTown.Games
+namespace PokerTown.Games.Misc
 {
     /// <summary>
     /// Extension to the <see cref="Random"/> class to help in poker mechanics.

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace PokerTown.Games.Helpers
@@ -7,7 +6,9 @@ namespace PokerTown.Games.Helpers
     public static class CardHelper
     {
         public const int CardHeight = 5;
+
         public const int PackedCardOffset = 4;
+
         public const int SpacedCardOffset = 7;
 
         public enum Suit
@@ -16,15 +17,6 @@ namespace PokerTown.Games.Helpers
             Diamonds,
             Hearts,
             Spades
-        }
-
-        public static Card GetRandomCard()
-        {
-            var random = new Random();
-            var s = random.Next(0, 4);
-            var suit = (Suit)s;
-            var value = random.Next(0, 13);
-            return new Card(suit, value);
         }
 
         public static void PrintCards(ICollection<Card> cards, int cardOffset)
@@ -42,29 +34,54 @@ namespace PokerTown.Games.Helpers
             int yPos = Console.CursorTop;
             foreach (var card in cards)
             {
-                PrintCard(card.Suit, card.Value, xOffset, yPos);
+                PrintCard(card, xOffset, yPos);
                 xOffset += cardOffset;
             }
         }
 
-        public static void PrintCard(Suit s, int v, int xOffset, int yOffset)
+        public static void PrintCard(Card card, int xOffset, int yOffset)
         {
             Console.SetCursorPosition(xOffset, yOffset);
             Console.WriteLine($"┌─────┐");
 
             Console.SetCursorPosition(xOffset, yOffset + 1);
             Console.Write("│");
-            PrintColouredCharacter(s, CardValueToString(v).PadRight(2));
-            Console.WriteLine("   │");
+            if (!card.Turned)
+            {
+                PrintColouredCharacter(card.Suit, card.ToString().PadRight(2));
+                Console.Write("   ");
+            }
+            else
+            {
+                Console.Write("▒▒▒▒▒");
+            }
+            Console.WriteLine("│");
 
             Console.SetCursorPosition(xOffset, yOffset + 2);
-            Console.Write("│  ");
-            PrintColouredCharacter(s, SuitToSymbol(s));
-            Console.WriteLine("  │");
+            Console.Write("│");
+            if (!card.Turned)
+            {
+                Console.Write("  ");
+                PrintColouredCharacter(card.Suit, SuitToSymbol(card.Suit));
+                Console.Write("  ");
+            }
+            else
+            {
+                Console.Write("▒▒▒▒▒");
+            }
+            Console.WriteLine("│");
 
             Console.SetCursorPosition(xOffset, yOffset + 3);
-            Console.Write("│   ");
-            PrintColouredCharacter(s, CardValueToString(v).PadLeft(2));
+            Console.Write("│");
+            if (!card.Turned)
+            {
+                Console.Write("   ");
+                PrintColouredCharacter(card.Suit, card.ToString().PadLeft(2));
+            }
+            else
+            {
+                Console.Write("▒▒▒▒▒");
+            }
             Console.WriteLine("│");
 
             Console.SetCursorPosition(xOffset, yOffset + 4);
@@ -80,35 +97,6 @@ namespace PokerTown.Games.Helpers
             Console.ForegroundColor = SuitToColour(suit);
             Console.Write(value);
             Console.ForegroundColor = previous;
-        }
-
-        /// <summary>
-        /// Convert raw card <paramref name="value"/> to letter representation on real cards.
-        /// </summary>
-        private static string CardValueToString(int value)
-        {
-            if (value == 0)
-            {
-                return "A";
-            }
-            else if (value >= 1 && value <= 9)
-            {
-                return (value + 1).ToString();
-            }
-            else if (value >= 10 && value <= 12)
-            {
-                return value switch
-                {
-                    10 => "J",
-                    11 => "Q",
-                    12 => "K",
-                    _ => throw new InvalidOperationException($"Unable to find case for {value} to card value"),
-                };
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException($"No card value matches {value}");
-            }
         }
 
         /// <summary>

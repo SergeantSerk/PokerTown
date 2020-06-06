@@ -1,7 +1,7 @@
-﻿using PokerTown.Games;
-using PokerTown.Games.Blackjack;
+﻿using PokerTown.Games.Blackjack;
 using System;
 using System.Text;
+using static PokerTown.Games.Blackjack.BlackjackPlayer;
 
 namespace PokerTown
 {
@@ -60,9 +60,25 @@ namespace PokerTown
             } while (true);
         }
 
+        public static PlayerChoice? AskPlayerChoice(params PlayerChoice[] choices)
+        {
+            var question = string.Join('/', choices);
+            Ask(question);
+            Console.Write("H/S/D: ");
+            var response = Console.ReadKey();
+            Console.WriteLine(Environment.NewLine);
+            return response.Key switch
+            {
+                ConsoleKey.H => PlayerChoice.Hit,
+                ConsoleKey.S => PlayerChoice.Stand,
+                ConsoleKey.D => PlayerChoice.DoubleDown,
+                _ => null,
+            };
+        }
+
         public static bool? AskBinary(string question)
         {
-            Console.WriteLine(question);
+            Ask(question);
             Console.Write("Y/N: ");
             var response = Console.ReadKey();
             Console.WriteLine(Environment.NewLine);
@@ -78,6 +94,12 @@ namespace PokerTown
             {
                 return null;
             }
+        }
+
+        private static void Ask(string question)
+        {
+            Console.SetCursorPosition(0, Console.WindowHeight - 5);
+            Console.WriteLine(question);
         }
     }
 }

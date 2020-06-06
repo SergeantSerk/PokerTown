@@ -1,8 +1,10 @@
-﻿using System;
+﻿using PokerTown.Games.Helpers;
+using PokerTown.Games.Misc;
+using System;
 using System.Collections.Generic;
 using static PokerTown.Games.Helpers.CardHelper;
 
-namespace PokerTown.Games.Helpers
+namespace PokerTown.Games.Blackjack
 {
     internal class BlackjackHelper : IGameHelper
     {
@@ -21,7 +23,7 @@ namespace PokerTown.Games.Helpers
                 for (int v = 0; v < 13; ++v)
                 {
                     var suitOffset = s * 13;
-                    cards[suitOffset + v] = new Card((Suit)s, v);
+                    cards[suitOffset + v] = new BlackjackCard((Suit)s, v);
                 }
             }
 

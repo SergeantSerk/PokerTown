@@ -1,20 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using static PokerTown.Games.Helpers.CardHelper;
+﻿using static PokerTown.Games.Helpers.CardHelper;
 
 namespace PokerTown.Games
 {
-    public class Card
+    public abstract class Card
     {
-        public Suit Suit { get; private set; }
+        internal int Identifier { get; }
 
-        public int Value { get; private set; }
+        public Suit Suit { get; }
 
-        public Card(Suit suit, int value)
+        public int Value { get; protected set; }
+
+        public bool Turned { get; set; }
+
+        public Card(Suit suit, int identifier)
         {
+            Identifier = identifier;
             Suit = suit;
-            Value = value;
+            Turned = false;
         }
     }
 }

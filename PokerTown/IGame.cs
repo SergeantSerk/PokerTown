@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace PokerTown.Games
+namespace PokerTown
 {
     public interface IGame
     {
