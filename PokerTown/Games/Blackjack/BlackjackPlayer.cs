@@ -11,12 +11,13 @@ namespace PokerTown.Games.Blackjack
         {
             Hit,
             Stand,
-            DoubleDown
+            DoubleDown,
+            Invalid
         }
 
         public PlayerChoice? Choice { get; set; }
 
-        public BlackjackPlayer(Position position, Hand hand) : base(position, hand)
+        public BlackjackPlayer(string name, Position position, Hand hand) : base(name, position, hand)
         {
             // Null infers the player hasn't chosen yet
             Choice = null;

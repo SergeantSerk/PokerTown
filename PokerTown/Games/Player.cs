@@ -16,12 +16,15 @@ namespace PokerTown.Games
 
     public class Player
     {
+        public string Name { get; private set; }
+
         public Position Position { get; set; }
 
         public Hand Hand { get; private set; }
 
-        public Player(Position position, Hand hand)
+        public Player(string name, Position position, Hand hand)
         {
+            Name = name;
             Position = position;
             Hand = hand;
         }

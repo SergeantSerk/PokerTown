@@ -26,56 +26,31 @@ namespace PokerTown.Games.Blackjack
                 var table = new Table();
                 var deck = BlackjackHelper.CreateDeck(shuffle: true);
 
-                Console.WriteLine("Dealer:");
-                var dealer = new BlackjackPlayer(new Position(Console.CursorLeft, Console.CursorTop), new BlackjackHand());
+                // reserve space for names
+                var dealer = new BlackjackPlayer("Dealer", new Position(Console.CursorLeft, Console.CursorTop + 1), new BlackjackHand());
+                Console.WriteLine($"{dealer.Name}:");
                 Console.SetCursorPosition(Console.CursorLeft, dealer.Position.Y + CardHelper.CardHeight + 1);
 
-                Console.WriteLine("You: ");
-                var player = new BlackjackPlayer(new Position(Console.CursorLeft, Console.CursorTop), new BlackjackHand());
+                // reserve space for names
+                var player = new BlackjackPlayer("You", new Position(Console.CursorLeft, Console.CursorTop + 1), new BlackjackHand());
+                Console.WriteLine($"{player.Name}: ");
                 #endregion
 
-                DealToPlayer(player, deck.Dequeue(), false);
-                DealToPlayer(dealer, deck.Dequeue(), true);
-                DealToPlayer(player, deck.Dequeue(), false);
-                DealToPlayer(dealer, deck.Dequeue(), false);
-
-                // check if dealer has 21
                 string matchMessage = string.Empty;
-                if (dealer.Hand.Value == 21)
-                {
-                    // flip over dealer's cards and display loss
-                    foreach (var card in dealer.Hand.Cards)
-                    {
-                        card.Turned = false;
-                    }
-                    PrintHand(dealer.Position, dealer.Hand.Cards);
+                var inProgress = true;
+                var playerTurn = true;
 
-                    // check if player also has 21
-                    if (player.Hand.Value == 21)
-                    {
-                        matchMessage = "Dealer has Blackjack, you too, it's a push.";
-                        Console.Title = $"{Name} - Push";
-                    }
-                    else
-                    {
-                        matchMessage = "Dealer has Blackjack, you don't, you lost!";
-                        Console.Title = $"{Name} - Lost";
-                    }
-                }
-                else if (player.Hand.Value == 21)
+                do
                 {
-                    // player has blackjack, dealer doesn't
-                    matchMessage = "You've got the Blackjack, you won!";
-                    Console.Title = $"{Name} - Won";
-                }
-                else
-                {
-                    bool inProgress = true;
-                    bool playerTurn = true;
-
-                    do
+                    if (playerTurn)
                     {
-                        if (playerTurn)
+                        if (player.Hand.Cards.Count < 2)
+                        {
+                            DealToPlayer(player, deck.Dequeue(), false);
+                            // player completes draw
+                            playerTurn = false;
+                        }
+                        else
                         {
                             var choices = new List<PlayerChoice>();
                             if (player.Choice == null)
@@ -92,37 +67,112 @@ namespace PokerTown.Games.Blackjack
                             // Stand = no further actions allowed
                             // Double down = no further actions allowed
 
-                            player.Choice = Program.AskPlayerChoice(choices.ToArray());
+                            do
+                            {
+                                player.Choice = Program.AskPlayerChoice(choices.ToArray());
+                            } while (player.Choice == PlayerChoice.Invalid);
+
                             switch (player.Choice)
                             {
                                 case PlayerChoice.Hit:
+                                case PlayerChoice.DoubleDown:
                                     DealToPlayer(player, deck.Dequeue(), false);
                                     break;
-                                case PlayerChoice.DoubleDown:
-                                    break;
                                 case PlayerChoice.Stand:
-                                    break;
+                                case null:
                                 default:
+                                    // player chooses stand or does not have any available choices left (like previously
+                                    // chose stand or double down)
+                                    playerTurn = false;
                                     break;
                             }
+                        }
 
-                            // player completes turn
-                            playerTurn = false;
+                        if (player.Hand.Value == 21)
+                        {
+                            if (player.Hand.Cards.Count == 2)
+                            {
+                                // player has blackjack, dealer doesn't
+                                matchMessage = "You've got 21, you won!";
+                                Console.Title = $"{Name} - Won";
+                            }
+                            else
+                            {
+                                // player has 21, dealer doesn't
+                                matchMessage = "You've got 21, you won!";
+                                Console.Title = $"{Name} - Won";
+                            }
+                            inProgress = false;
+                        }
+                        else if (player.Hand.Value > 21)
+                        {
+                            // player has blackjack, dealer doesn't
+                            matchMessage = "Unfortunate, you've gone over 21, you lost.";
+                            Console.Title = $"{Name} - Bust";
+                            inProgress = false;
+                        }
+                    }
+                    else
+                    {
+                        // dealer always hits
+                        // if hand is empty
+                        if (dealer.Hand.Cards.Count < 2)
+                        {
+                            // draw a turned over card
+                            DealToPlayer(dealer, deck.Dequeue(), dealer.Hand.Cards.Count == 0);
+                            playerTurn = true;
                         }
                         else
                         {
-                            // dealer always hits
                             DealToPlayer(dealer, deck.Dequeue(), false);
-
-                            playerTurn = true;
                         }
-                    } while (inProgress);
+
+                        if (dealer.Hand.Value == 21)
+                        {
+                            // check if it is a straight blackjack
+                            if (dealer.Hand.Cards.Count == 2)
+                            {
+                                // check if player also has 21
+                                if (player.Hand.Value == 21)
+                                {
+                                    matchMessage = "Dealer has instant Blackjack, you too, it's a push.";
+                                    Console.Title = $"{Name} - Push";
+                                }
+                                else
+                                {
+                                    matchMessage = "Dealer has instant Blackjack, you don't, you lost!";
+                                    Console.Title = $"{Name} - Lost";
+                                }
+                            }
+                            else
+                            {
+                                matchMessage = "Dealer has 21, you lost!";
+                                Console.Title = $"{Name} - Lost";
+                            }
+                            inProgress = false;
+                        }
+                        else if (dealer.Hand.Value > 21)
+                        {
+                            matchMessage = "Dealer is bust, you won!";
+                            Console.Title = $"{Name} - Won";
+                            inProgress = false;
+                        }
+                    }
+                } while (inProgress);
+
+                // match should not be in progress
+                // flip over dealer's cards
+                foreach (var card in dealer.Hand.Cards)
+                {
+                    card.Turned = false;
                 }
+                PrintHand(dealer);
+                PrintHand(player);
 
                 bool? postChoice;
                 do
                 {
-                    postChoice = Program.AskBinary($"{matchMessage} Continue playing?");
+                    postChoice = Program.AskBinary($"{matchMessage} Play again?");
                     if (postChoice == true)
                     {
                         Console.WriteLine("Starting another round.");
@@ -138,18 +188,18 @@ namespace PokerTown.Games.Blackjack
                 Console.Clear();
             } while (playing);
         }
-        
+
         private void DealToPlayer(Player player, Card card, bool turned)
         {
             card.Turned = turned;
             player.Hand.Add(card);
-            PrintHand(player.Position, player.Hand.Cards);
+            PrintHand(player);
         }
 
-        private void PrintHand(Position position, ICollection<Card> cards)
+        private void PrintHand(Player player)
         {
-            Console.SetCursorPosition(position.X, position.Y);
-            CardHelper.PrintCards(cards, CardHelper.SpacedCardOffset);
+            Console.SetCursorPosition(player.Position.X, player.Position.Y);
+            CardHelper.PrintCards(player.Hand.Cards, CardHelper.SpacedCardOffset);
             Thread.Sleep(DealingDurationMilliseconds);
         }
     }

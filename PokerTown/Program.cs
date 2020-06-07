@@ -62,6 +62,11 @@ namespace PokerTown
 
         public static PlayerChoice? AskPlayerChoice(params PlayerChoice[] choices)
         {
+            if (choices.Length == 0)
+            {
+                return null;
+            }
+
             var question = string.Join('/', choices);
             Ask(question);
             Console.Write("H/S/D: ");
@@ -72,7 +77,7 @@ namespace PokerTown
                 ConsoleKey.H => PlayerChoice.Hit,
                 ConsoleKey.S => PlayerChoice.Stand,
                 ConsoleKey.D => PlayerChoice.DoubleDown,
-                _ => null,
+                _ => PlayerChoice.Invalid,
             };
         }
 
