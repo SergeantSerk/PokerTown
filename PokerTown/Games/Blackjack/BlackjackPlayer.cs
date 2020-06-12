@@ -9,18 +9,31 @@ namespace PokerTown.Games.Blackjack
     {
         public enum PlayerChoice
         {
-            Hit,
+            Invalid,
             Stand,
             DoubleDown,
-            Invalid
+            Hit
         }
+
+        public enum PlayerResult
+        {
+            Bust,
+            Push,
+            Win
+        }
+
+        public bool Dealer { get; private set; }
 
         public PlayerChoice? Choice { get; set; }
 
-        public BlackjackPlayer(string name, Position position, Hand hand) : base(name, position, hand)
+        public BlackjackHand Hand { get; private set; }
+
+        public BlackjackPlayer(string name, bool dealer) : base(name)
         {
             // Null infers the player hasn't chosen yet
             Choice = null;
+            Dealer = dealer;
+            Hand = new BlackjackHand();
         }
     }
 }
