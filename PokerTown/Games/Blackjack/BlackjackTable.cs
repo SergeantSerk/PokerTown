@@ -20,7 +20,7 @@ namespace PokerTown.Games.Blackjack
 
     internal class BlackjackTable
     {
-        private const int DealingDurationMilliseconds = 750;
+        private const int DealingDurationMilliseconds = 100;
 
         private Blackjack game;
         private Position dealerPosition;
@@ -39,7 +39,7 @@ namespace PokerTown.Games.Blackjack
             Players = new Queue<PlayerData>();
         }
 
-        public void AddPlayer(string name)
+        public BlackjackPlayer AddPlayer(string name)
         {
             var player = new BlackjackPlayer(name, false);
             // derive new player's position using old player's position
@@ -47,6 +47,7 @@ namespace PokerTown.Games.Blackjack
             playerPosition = position;
             var tuple = new PlayerData(player, position);
             Players.Enqueue(tuple);
+            return player;
         }
 
         public void RemovePlayer(string name)
@@ -142,14 +143,22 @@ namespace PokerTown.Games.Blackjack
                         // player count == 0 since last player was dequeued
                         // turn over dealer cards
                         // flip over dealer's cards
-                        foreach (var card in dataPair.Player.Hand.Cards)
+                        var dealer = dataPair;
+                        foreach (var card in dealer.Player.Hand.Cards)
                         {
                             card.Turned = false;
                         }
 
+                        // find the highest hand value amongst all players
+                        var max = 0;
+                        foreach (var player in players)
+                        {
+                            // find the highest value hand while not losing the game (between 0 and 21 inclusive)
+                            max = Math.Max(max, Math.Min(21, player.Player.Hand.Value));
+                        }
+
                         // TO-DO: dealer logic
                         // begin dealer drawing (we should have one more player remaining, dealer)
-                        var dealer = dataPair;
                         while (dealer.Player.Hand.Value < 21)
                         {
                             DealToPlayer(dealer.Player, deck.Dequeue(), false);
@@ -225,7 +234,6 @@ namespace PokerTown.Games.Blackjack
                         {
                             do
                             {
-                                Console.Clear();
                                 PrintTable(players);
                                 dataPair.Player.Choice = BlackjackHelper.AskPlayerChoice(dataPair.Player);
                             } while (dataPair.Player.Choice == PlayerChoice.Invalid);
@@ -302,6 +310,7 @@ namespace PokerTown.Games.Blackjack
                 }
             }
 
+            // post-game conditions, if no one won, push or lost
             if (winners.Count == 0)
             {
                 winners.Add("None");
@@ -332,7 +341,6 @@ namespace PokerTown.Games.Blackjack
 
         private void PrintTable(PlayerData[] players)
         {
-            Console.Clear();
             foreach (var player in players)
             {
                 Console.SetCursorPosition(player.Position.X, player.Position.Y);
@@ -362,7 +370,7 @@ namespace PokerTown.Games.Blackjack
                     }
                 }
             }
-            Console.WriteLine($"{Environment.NewLine}{player.Name} ({player.Hand.Value - valueOffset}):");
+            Console.WriteLine($"{Environment.NewLine}{(!player.Dealer ? $"[{player.Balance}] " : "")}{player.Name} ({player.Hand.Value - valueOffset}):");
             CardHelper.PrintCards(player.Hand.Cards, CardHelper.SpacedCardOffset);
         }
     }

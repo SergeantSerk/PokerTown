@@ -1,9 +1,6 @@
-﻿using PokerTown.Games;
-using PokerTown.Games.Blackjack;
+﻿using PokerTown.Games.Blackjack;
 using System;
-using System.Collections.Generic;
 using System.Text;
-using static PokerTown.Games.Blackjack.BlackjackPlayer;
 
 namespace PokerTown
 {
@@ -84,7 +81,16 @@ namespace PokerTown
 
         internal static void Ask(string question)
         {
-            Console.SetCursorPosition(0, Console.WindowHeight - 5);
+            int offset = 5;
+            // set initial position that the question will be asked
+            Console.SetCursorPosition(0, Console.WindowHeight - offset);
+            // wipe area below it
+            for (int i = 0; i < offset - 1; ++i)
+            {
+                Console.WriteLine("".PadRight(Console.WindowWidth - 1));
+            }
+            // reset inital position and ask
+            Console.SetCursorPosition(0, Console.WindowHeight - offset);
             Console.WriteLine(question);
         }
     }

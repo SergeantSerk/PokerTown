@@ -18,6 +18,8 @@ namespace PokerTown.Games
     {
         public string Name { get; private set; }
 
+        public double Balance { get; set; }
+
         public Player(string name)
         {
             Name = name;

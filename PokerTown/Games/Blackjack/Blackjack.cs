@@ -19,14 +19,13 @@ namespace PokerTown.Games.Blackjack
             Console.Title = Name;
             var playing = true;
 
-            BlackjackTable table;
             do
             {
-                table = new BlackjackTable(this, new Position(Console.CursorLeft, Console.CursorTop));
-                table.AddPlayer("Player 1");
-                table.AddPlayer("Player 2");
-                table.AddPlayer("Player 3");
-                table.AddPlayer("Player 4");
+                var table = new BlackjackTable(this, new Position(Console.CursorLeft, Console.CursorTop));
+                table.AddPlayer("Player 1").Balance = 1000;
+                table.AddPlayer("Player 2").Balance = 1000;
+                table.AddPlayer("Player 3").Balance = 1000;
+                table.AddPlayer("Player 4").Balance = 1000;
                 table.Play();
 
                 bool? postChoice;
